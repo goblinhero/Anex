@@ -1,0 +1,6 @@
+@Anex.Api_HostAddress = http://localhost:5236
+
+GET {{Anex.Api_HostAddress}}/ledgertag/
+Accept: application/json
+
+###
