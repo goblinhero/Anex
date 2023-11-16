@@ -5,6 +5,8 @@ VisualStudioVersion = 17.7.34302.85
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anex.Api", "Anex.Api\Anex.Api.csproj", "{A166C1E3-B89F-4767-9587-674AB7284EB8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anex.Domain", "Anex.Domain\Anex.Domain.csproj", "{8F33DD90-72FB-41A6-9DA3-3E1443238EA6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,8 +17,15 @@ Global
 		{A166C1E3-B89F-4767-9587-674AB7284EB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A166C1E3-B89F-4767-9587-674AB7284EB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A166C1E3-B89F-4767-9587-674AB7284EB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F33DD90-72FB-41A6-9DA3-3E1443238EA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F33DD90-72FB-41A6-9DA3-3E1443238EA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F33DD90-72FB-41A6-9DA3-3E1443238EA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F33DD90-72FB-41A6-9DA3-3E1443238EA6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {03D74524-6003-4956-984E-102AA943897E}
 	EndGlobalSection
 EndGlobal
