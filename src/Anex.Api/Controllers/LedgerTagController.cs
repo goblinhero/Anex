@@ -1,6 +1,10 @@
+using Anex.Api.Database;
+using Anex.Api.Database.Queries;
 using Anex.Api.Dto;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Anex.Api.Controllers
 {
@@ -8,26 +12,28 @@ namespace Anex.Api.Controllers
     [Route("[controller]")]
     public class LedgerTagController : ControllerBase
     {
-        private static Dictionary<long, LedgerTagDto> _ledgerTags = new Dictionary<long,LedgerTagDto>
+        private readonly ISessionHelper _sessionHelper;
+
+        public LedgerTagController(ISessionHelper sessionHelper)
         {
-            {1, new LedgerTagDto{Id=1, Description="Telephone costs"}},
-            {2, new LedgerTagDto{Id=2, Description="Other costs"} }
-        };
-        public LedgerTagController()
-        {
+            _sessionHelper = sessionHelper;
         }
 
         [HttpGet()]
         public async Task<IActionResult> Get()
         {
-            return Ok(_ledgerTags.Values);
+            var query = await _sessionHelper.TryExecuteQuery(new GetListQuery<LedgerTagDto>());
+            return query.Success
+                ? Ok(query.Result)
+                : NotFound();
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(long id)
         {
-            return _ledgerTags.TryGetValue(id, out var ledgerTag) 
-                ? Ok(ledgerTag) 
+            var query = await _sessionHelper.TryExecuteQuery(new GetQuery<LedgerTagDto>(id));
+            return query.Success 
+                ? Ok(query.Result) 
                 : NotFound();
         }
     }

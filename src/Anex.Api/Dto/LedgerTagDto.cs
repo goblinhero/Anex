@@ -1,8 +1,9 @@
-﻿namespace Anex.Api.Dto
+﻿using Anex.Api.Dto.Abstract;
+
+namespace Anex.Api.Dto
 {
-    public class LedgerTagDto
+    public class LedgerTagDto : EntityDto
     {
-        public long? Id { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
     }
 }
