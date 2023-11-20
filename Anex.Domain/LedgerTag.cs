@@ -3,11 +3,18 @@ using Anex.Domain.Rules;
 
 namespace Anex.Domain;
 
-public class LedgerTag : Entity<LedgerTag>
+public class LedgerTag : BaseEntity<LedgerTag>
 {
+    protected LedgerTag() { }
+
+    public static LedgerTag Create(string description)
+    {
+        return new LedgerTag { Description = description };
+    }
+
     public virtual string Description { get; set; } = string.Empty;
     protected override IEnumerable<IRule<LedgerTag>> GetValidationRules()
     {
-        yield return new RelayRule<LedgerTag>(lt => string.IsNullOrWhiteSpace(lt.Description), "Description cannot be empty for a ledger tag");
+        yield return CannotBeEmpty(lt => lt.Description);
     }
 }
