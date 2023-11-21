@@ -1,3 +1,4 @@
+using System;
 using Anex.Api.Database;
 using Anex.Api.Database.Queries;
 using Anex.Api.Dto;
@@ -37,10 +38,21 @@ namespace Anex.Api.Controllers
                 : NotFound();
         }
 
-        [HttpGet("Connection")]
-        public Task<IActionResult> GetConnectionString()
+        [HttpGet("Environment")]
+        public Task<IActionResult> GetEnvironmentVariables()
         {
-            return Task.FromResult((IActionResult)Ok(_sessionHelper.GetConnectionString()));
+            return Task.FromResult((IActionResult)Ok(Environment.GetEnvironmentVariables()));
+        }
+        
+        [HttpGet("ConnectionStrings")]
+        public Task<IActionResult> ConnectionStrings()
+        {
+            var connections = new List<string>();
+            foreach (System.Configuration.ConnectionStringSettings css in System.Configuration.ConfigurationManager.ConnectionStrings)
+            {
+                connections.Add(css.ConnectionString);
+            }
+            return Task.FromResult((IActionResult)Ok(connections));
         }
     }
 }
