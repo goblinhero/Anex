@@ -11,6 +11,7 @@ using Anex.Api.Database.Listeners;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Anex.Api.Database.Commands;
 using Anex.Api.Database.Queries;
 
 namespace Anex.Api.Database;
@@ -91,6 +92,7 @@ public class SessionHelper : ISessionHelper
         using (var tx = session.BeginTransaction())
         {
             var result = await query.TryExecute(session);
+            await tx.RollbackAsync();
             return result;
         }
     }
@@ -98,5 +100,29 @@ public class SessionHelper : ISessionHelper
     public string? GetConnectionString()
     {
         return _connectionString;
+    }
+
+    public async Task<CommandResult> TryExecuteCommand(IExecutableCommand command)
+    {
+        if (_sessionFactory == null)
+        {
+            Initialize();
+            return await TryExecuteCommand(command);
+        }
+        
+        using (var session = _sessionFactory.OpenSession())
+        using (var tx = session.BeginTransaction())
+        {
+            var result = await command.TryExecute(session);
+            if (result.Success)
+            {
+                await tx.CommitAsync();
+            }
+            else
+            {
+                await tx.RollbackAsync();
+            }            
+            return result;
+        }
     }
 }
