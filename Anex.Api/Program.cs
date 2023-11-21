@@ -1,12 +1,12 @@
+using System;
 using Anex.Api.Database;
 using Anex.Api.Database.Mappings;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("POSTGRESQLCONNSTR_CONNECTION_ANEX_DB");
+var connectionString = Environment.GetEnvironmentVariable("POSTGRESQLCONNSTR_CONNECTION_ANEX_DB");
 
 if (!string.IsNullOrEmpty(connectionString))
 {
