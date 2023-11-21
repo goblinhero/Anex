@@ -36,5 +36,11 @@ namespace Anex.Api.Controllers
                 ? Ok(query.Result) 
                 : NotFound();
         }
+
+        [HttpGet("Connection")]
+        public Task<IActionResult> GetConnectionString()
+        {
+            return Task.FromResult((IActionResult)Ok(_sessionHelper.GetConnectionString()));
+        }
     }
 }
