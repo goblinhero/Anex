@@ -18,11 +18,24 @@ namespace Anex.Api.Database;
 public class SessionHelper : ISessionHelper
 {
     private static ISessionFactory? _sessionFactory;
+    private static string? _connectionString;
+    private static bool? _createDatabase;
+    private static Type[]? _mappingTypes;
 
     public static void Initialize(bool createDatabase, string connectionString, params Type[] mappingTypes)
     {
+        _connectionString = connectionString;
+        _createDatabase = createDatabase;
+        _mappingTypes = mappingTypes;
+    }
+
+    private void Initialize()
+    {
+        if (_mappingTypes == null) throw new Exception("No mapping types");
+        
+        
         var modelMapper = new ModelMapper();
-        var mappings = mappingTypes
+        var mappings = _mappingTypes
             .Select(Assembly.GetAssembly)
             .Distinct()
             .SelectMany(a =>
@@ -42,7 +55,7 @@ public class SessionHelper : ISessionHelper
         var configuration = new Configuration()
             .DataBaseIntegration(dbcp =>
             {
-                dbcp.ConnectionString = connectionString;
+                dbcp.ConnectionString = _connectionString;
                 dbcp.Driver<NpgsqlDriver>();
                 dbcp.Dialect<PostgreSQL83Dialect>();
             });
@@ -61,19 +74,29 @@ public class SessionHelper : ISessionHelper
         {
             new DisallowDeleteTransactionListener()
         };
-        if (createDatabase)
+        if (_createDatabase != null && _createDatabase.Value)
             new SchemaExport(configuration).Execute(true, true, false);
         _sessionFactory = configuration.BuildSessionFactory();
     }
 
     public async Task<QueryResult<T>> TryExecuteQuery<T>(IExecutableQuery<T> query)
     {
-        if (_sessionFactory == null) throw new Exception("Sessionfactory has not been initialized. Should be initialized at app startup using static method .Initialize()");
+        if (_sessionFactory == null)
+        {
+            Initialize();
+            return await TryExecuteQuery<T>(query);
+        }
+        
         using (var session = _sessionFactory.OpenSession())
         using (var tx = session.BeginTransaction())
         {
             var result = await query.TryExecute(session);
             return result;
         }
+    }
+
+    public string? GetConnectionString()
+    {
+        return _connectionString;
     }
 }
