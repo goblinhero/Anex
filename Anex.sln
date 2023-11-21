@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Anex.Api", "Anex.Api\Anex.A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Anex.Domain", "Anex.Domain\Anex.Domain.csproj", "{8F33DD90-72FB-41A6-9DA3-3E1443238EA6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anex.Domain.Tests", "Anex.Domain.Tests\Anex.Domain.Tests.csproj", "{81B1DD7F-43A7-4CF8-BE8D-AE016C03AF99}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{8F33DD90-72FB-41A6-9DA3-3E1443238EA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F33DD90-72FB-41A6-9DA3-3E1443238EA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F33DD90-72FB-41A6-9DA3-3E1443238EA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81B1DD7F-43A7-4CF8-BE8D-AE016C03AF99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81B1DD7F-43A7-4CF8-BE8D-AE016C03AF99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81B1DD7F-43A7-4CF8-BE8D-AE016C03AF99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81B1DD7F-43A7-4CF8-BE8D-AE016C03AF99}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
