@@ -7,12 +7,12 @@ public class LedgerTag : BaseEntity<LedgerTag>
 {
     protected LedgerTag() { }
 
-    public static LedgerTag Create(string description)
+    public static LedgerTag Create(string? description)
     {
         return new LedgerTag { Description = description };
     }
 
-    public virtual string Description { get; set; } = string.Empty;
+    public virtual string? Description { get; set; } = string.Empty;
     protected override IEnumerable<IRule<LedgerTag>> GetValidationRules()
     {
         yield return CannotBeEmpty(lt => lt.Description);

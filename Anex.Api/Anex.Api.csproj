@@ -26,8 +26,4 @@
     <ProjectReference Include="..\Anex.Domain\Anex.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Database\Commands\" />
-  </ItemGroup>
-
 </Project>

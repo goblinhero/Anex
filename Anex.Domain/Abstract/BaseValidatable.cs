@@ -16,7 +16,7 @@ public abstract class BaseValidatable<T> : IIsValidatable
     {
         return Enumerable.Empty<IRule<T>>();
     }
-    protected IRule<T> CannotBeEmpty(Expression<Func<T, string>> property)
+    protected IRule<T> CannotBeEmpty(Expression<Func<T, string?>> property)
     {
         var expression = property.Compile();
         Predicate<T> isBrokenWhen = T => string.IsNullOrWhiteSpace(expression(T));

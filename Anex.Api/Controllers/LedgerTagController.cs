@@ -4,6 +4,8 @@ using Anex.Api.Database.Queries;
 using Anex.Api.Dto;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Anex.Api.Database.Commands;
+using Anex.Domain;
 using NHibernate.Linq;
 
 namespace Anex.Api.Controllers;
@@ -19,7 +21,7 @@ public class LedgerTagController : ControllerBase
         _sessionHelper = sessionHelper;
     }
 
-    [HttpGet()]
+    [HttpGet]
     public async Task<IActionResult> Get()
     {
         var query = await _sessionHelper.TryExecuteQuery(new GetListQuery<LedgerTagDto>());
@@ -35,6 +37,34 @@ public class LedgerTagController : ControllerBase
         return query.Success
             ? Ok(query.Result)
             : NotFound();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create(LedgerTagDto dto)
+    {
+        var command = new CreateLedgerTagCommand(dto);
+        var commandResult = await _sessionHelper.TryExecuteCommand(command);
+        if (!commandResult.Success)
+        {
+            return BadRequest(commandResult);
+        }
+
+        return command.AssignedId.HasValue
+            ? await GetById(command.AssignedId.Value)
+            : BadRequest("Failed to assign id");
+    }
+    
+    [HttpDelete]
+    public async Task<IActionResult> DeleteById(long id)
+    {
+        var command = new DeleteEntityCommand<LedgerTag>(id);
+        var commandResult = await _sessionHelper.TryExecuteCommand(command);
+        if (!commandResult.Success)
+        {
+            return BadRequest(commandResult);
+        }
+
+        return Ok($"LedgerTag with id: {id} deleted.");
     }
 
     [HttpGet("Environment")]
