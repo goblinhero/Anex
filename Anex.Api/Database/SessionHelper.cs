@@ -43,8 +43,8 @@ public class SessionHelper : ISessionHelper
             .DataBaseIntegration(dbcp =>
             {
                 dbcp.ConnectionString = connectionString;
-                dbcp.Driver<SqlClientDriver>();
-                dbcp.Dialect<MsSql2012Dialect>();
+                dbcp.Driver<NpgsqlDriver>();
+                dbcp.Dialect<PostgreSQL83Dialect>();
             });
         configuration.AddDeserializedMapping(modelMapper.CompileMappingForAllExplicitlyAddedEntities(), "mappings");
         configuration.EventListeners.PreInsertEventListeners = new IPreInsertEventListener[]
