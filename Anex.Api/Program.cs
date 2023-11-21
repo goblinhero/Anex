@@ -12,6 +12,10 @@ if (!string.IsNullOrEmpty(connectionString))
 {
     SessionHelper.Initialize(true, connectionString, typeof(LedgerTagMapping));
 }
+else
+{
+    SessionHelper.Initialize(true, "Server=localhost;Database=Anex_DB;Port=5432;User Id=postgres;Password=mysecretpassword;",typeof(LedgerTagMapping));
+}
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
