@@ -1,4 +1,3 @@
-using System;
 using Anex.Api.Database;
 using Anex.Api.Database.Queries;
 using Anex.Api.Dto;
@@ -65,27 +64,5 @@ public class LedgerTagController : ControllerBase
         }
 
         return Ok($"LedgerTag with id: {id} deleted.");
-    }
-
-    [HttpGet("Environment")]
-    public Task<IActionResult> GetEnvironmentVariables()
-    {
-        return Task.FromResult((IActionResult)Ok(_sessionHelper.GetConnectionString()));
-    }
-
-    [HttpGet("Testers")]
-    public async Task<IActionResult> GetException()
-    {
-        try
-        {
-            var query = await _sessionHelper.TryExecuteQuery(new GetListQuery<LedgerTagDto>());
-            return query.Success
-                ? Ok(query.Result)
-                : NotFound();
-        }
-        catch (Exception ex)
-        {
-            return Ok(new { ex.Message, ex.StackTrace });
-        }
     }
 }

@@ -10,11 +10,11 @@ var connectionString = Environment.GetEnvironmentVariable("POSTGRESQLCONNSTR_CON
 
 if (!string.IsNullOrEmpty(connectionString))
 {
-    SessionHelper.Initialize(true, connectionString, typeof(LedgerTagMapping));
+    SessionHelper.Initialize(connectionString, typeof(LedgerTagMapping));
 }
 else
 {
-    SessionHelper.Initialize(true, "Server=localhost;Database=Anex_DB;Port=5432;User Id=postgres;Password=mysecretpassword;",typeof(LedgerTagMapping));
+    SessionHelper.Initialize("Server=localhost;Database=Anex_DB;Port=5432;User Id=postgres;Password=mysecretpassword;",typeof(LedgerTagMapping));
 }
 
 builder.Services.AddControllers();

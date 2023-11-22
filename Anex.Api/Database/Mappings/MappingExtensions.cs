@@ -11,8 +11,14 @@ public static class MappingExtensions
         where TMapping : ClassMapping<TType>
         where TType : class, IEntity
     {
-        mapping.Id(m => m.Id, m => m.Generator(Generators.HighLow, g => g.Params(new { max_lo = 100 })));
-        mapping.Version(m => m.Version, m => m.Column("Version"));
+        mapping.Id(m => m.Id, m => m.Generator(Generators.HighLow, g => g.Params(new
+        {
+            max_lo = 50,
+            table = "nhibernate_ids",
+            column = "next_hi",
+            where = $"entity = '{typeof(TType).Name.ToLower()}'"
+        })));
+        mapping.Version(m => m.Version, m => m.Column("version"));
         mapping.Property(m => m.Created, pm => pm.NotNullable(true));
     }
 
@@ -23,7 +29,7 @@ public static class MappingExtensions
         mapping.Lazy(false);
         mapping.Mutable(false);
         mapping.Id(m => m.Id, m => m.Generator(Generators.Assigned));
-        mapping.Property(m => m.Version, m => m.Column("Version"));
+        mapping.Property(m => m.Version, m => m.Column("version"));
         mapping.Property(m => m.Created, pm => pm.NotNullable(true));
     }
 }
