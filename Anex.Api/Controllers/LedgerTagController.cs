@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Text.Json;
 using Anex.Api.Database;
 using Anex.Api.Database.Queries;
 using Anex.Api.Dto;
@@ -39,7 +41,7 @@ public class LedgerTagController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(LedgerTagDto dto)
+    public async Task<IActionResult> Create(EditableLedgerTagDto dto)
     {
         var command = new CreateLedgerTagCommand(dto);
         var commandResult = await _sessionHelper.TryExecuteCommand(command);
@@ -52,12 +54,29 @@ public class LedgerTagController : ControllerBase
             ? await GetById(command.AssignedId.Value)
             : BadRequest("Failed to assign id");
     }
+
+    [HttpPut("{id}/{version}")]
+    public async Task<IActionResult> Update(long id, int version, EditableLedgerTagDto dto)
+    {
+        var commandResult = await _sessionHelper.TryExecuteCommand(new UpdateLedgerTagCommand(id, version, dto));
+        return !commandResult.Success 
+            ? BadRequest(commandResult) 
+            : await GetById(id);
+    }
+    
+    [HttpPatch("{id}/{version}")]
+    public async Task<IActionResult> Patch(long id, int version, Dictionary<string, JsonElement> updates)
+    {
+        var commandResult = await _sessionHelper.TryExecuteCommand(new PatchLedgerTagCommand(id, version, updates));
+        return !commandResult.Success 
+            ? BadRequest(commandResult) 
+            : await GetById(id);
+    }
     
     [HttpDelete]
     public async Task<IActionResult> DeleteById(long id)
     {
-        var command = new DeleteEntityCommand<LedgerTag>(id);
-        var commandResult = await _sessionHelper.TryExecuteCommand(command);
+        var commandResult = await _sessionHelper.TryExecuteCommand(new DeleteEntityCommand<LedgerTag>(id));
         if (!commandResult.Success)
         {
             return BadRequest(commandResult);

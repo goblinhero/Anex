@@ -7,9 +7,9 @@ namespace Anex.Api.Database.Commands;
 
 public class CreateLedgerTagCommand : IExecutableCommand
 {
-    private readonly LedgerTagDto _dto;
+    private readonly EditableLedgerTagDto _dto;
 
-    public CreateLedgerTagCommand(LedgerTagDto dto)
+    public CreateLedgerTagCommand(EditableLedgerTagDto dto)
     {
         _dto = dto;
     }
@@ -17,6 +17,7 @@ public class CreateLedgerTagCommand : IExecutableCommand
     public async Task<CommandResult> TryExecute(ISession session)
     {
         var ledgerTag = LedgerTag.Create(_dto.Description);
+        ledgerTag.Number = _dto.Number;
         if (!ledgerTag.IsValid(out var errors))
         {
             return new CommandResult(errors);
