@@ -8,7 +8,7 @@ public class Migration_20231112_01_CleanUp : Migration
     public override void Up()
     {
         //These are tables temporarily created by using nhibernate schemaexport for early testing purpose
-        foreach (var table in new[]{"hibernate_unique_key","LedgerTag"})
+        foreach (var table in new[]{"hibernate_unique_key","ledgertag"})
         {
             if (Schema.Table(table).Exists())
             {
