@@ -17,12 +17,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentMigrator.Runner" Version="3.3.2" />
     <PackageReference Include="NHibernate" Version="5.4.6" />
     <PackageReference Include="Npgsql" Version="8.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Anex.DBMigration\Anex.DBMigration.csproj" />
     <ProjectReference Include="..\Anex.Domain\Anex.Domain.csproj" />
   </ItemGroup>
 

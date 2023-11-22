@@ -13,6 +13,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Anex.Api.Database.Commands;
 using Anex.Api.Database.Queries;
+using Anex.DBMigration;
+using FluentMigrator.Runner;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Anex.Api.Database;
 
@@ -20,23 +23,11 @@ public class SessionHelper : ISessionHelper
 {
     private static ISessionFactory? _sessionFactory;
     private static string? _connectionString;
-    private static bool? _createDatabase;
-    private static Type[]? _mappingTypes;
-
-    public static void Initialize(bool createDatabase, string connectionString, params Type[] mappingTypes)
+    public static void Initialize(string connectionString, params Type[] mappingTypes)
     {
         _connectionString = connectionString;
-        _createDatabase = createDatabase;
-        _mappingTypes = mappingTypes;
-    }
-
-    private void Initialize()
-    {
-        if (_mappingTypes == null) throw new Exception("No mapping types");
-        
-        
         var modelMapper = new ModelMapper();
-        var mappings = _mappingTypes
+        var mappings = mappingTypes
             .Select(Assembly.GetAssembly)
             .Distinct()
             .SelectMany(a =>
@@ -45,9 +36,9 @@ public class SessionHelper : ISessionHelper
                 return a.GetExportedTypes();
             });
         modelMapper.AddMappings(mappings);
-        modelMapper.BeforeMapManyToOne += (modelInspector, propertyPath, map) =>
+        modelMapper.BeforeMapManyToOne += (_, propertyPath, map) =>
             map.Column(propertyPath.LocalMember.Name + "Id");
-        modelMapper.BeforeMapProperty += (inspector, member, customizer) =>
+        modelMapper.BeforeMapProperty += (_, member, customizer) =>
         {
             if (member.GetRootMember().MemberType == MemberTypes.Property &&
                 ((PropertyInfo)member.GetRootMember()).PropertyType == typeof(DateTime))
@@ -56,7 +47,7 @@ public class SessionHelper : ISessionHelper
         var configuration = new Configuration()
             .DataBaseIntegration(dbcp =>
             {
-                dbcp.ConnectionString = _connectionString;
+                dbcp.ConnectionString = connectionString;
                 dbcp.Driver<NpgsqlDriver>();
                 dbcp.Dialect<PostgreSQL83Dialect>();
             });
@@ -75,18 +66,12 @@ public class SessionHelper : ISessionHelper
         {
             new DisallowDeleteTransactionListener()
         };
-        if (_createDatabase != null && _createDatabase.Value)
-            new SchemaExport(configuration).Execute(true, true, false);
         _sessionFactory = configuration.BuildSessionFactory();
     }
 
     public async Task<QueryResult<T>> TryExecuteQuery<T>(IExecutableQuery<T> query)
     {
-        if (_sessionFactory == null)
-        {
-            Initialize();
-            return await TryExecuteQuery<T>(query);
-        }
+        if (_sessionFactory == null) throw new Exception("Critical error, SessionFactory not initialized.");
         
         using (var session = _sessionFactory.OpenSession())
         using (var tx = session.BeginTransaction())
@@ -97,18 +82,9 @@ public class SessionHelper : ISessionHelper
         }
     }
 
-    public string? GetConnectionString()
-    {
-        return _connectionString;
-    }
-
     public async Task<CommandResult> TryExecuteCommand(IExecutableCommand command)
     {
-        if (_sessionFactory == null)
-        {
-            Initialize();
-            return await TryExecuteCommand(command);
-        }
+        if (_sessionFactory == null) throw new Exception("Critical error, SessionFactory not initialized.");
         
         using (var session = _sessionFactory.OpenSession())
         using (var tx = session.BeginTransaction())
@@ -124,5 +100,36 @@ public class SessionHelper : ISessionHelper
             }            
             return result;
         }
+    }
+
+    public void MigrateDatabaseToNewest()
+    {
+        RunMigrationAction(r => r.MigrateUp());
+    }
+
+    public void MigrateDatabaseDownToVersion(long version)
+    {
+        RunMigrationAction(r => r.MigrateDown(version));
+    }
+
+    private static void RunMigrationAction(Action<IMigrationRunner> action)
+    {
+        using (var serviceProvider = CreateMigrationServices())
+        using (var scope = serviceProvider.CreateScope()) //The scope ensures all instances are properly disposed 
+        {
+            var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
+            action(runner);
+        }
+    }
+    private static ServiceProvider CreateMigrationServices()
+    {
+        return new ServiceCollection()
+            .AddFluentMigratorCore()
+            .ConfigureRunner(rb => rb
+                .AddPostgres11_0()
+                .WithGlobalConnectionString(_connectionString)
+                .ScanIn(typeof(Migration_20231112_01_CleanUp).Assembly).For.Migrations())
+            .AddLogging(lb => lb.AddFluentMigratorConsole())
+            .BuildServiceProvider(false);
     }
 }

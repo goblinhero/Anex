@@ -7,6 +7,7 @@ namespace Anex.Api.Database;
 public interface ISessionHelper
 {
     Task<QueryResult<T>> TryExecuteQuery<T>(IExecutableQuery<T> query);
-    string? GetConnectionString();
     Task<CommandResult> TryExecuteCommand(IExecutableCommand command);
+    void MigrateDatabaseToNewest();
+    void MigrateDatabaseDownToVersion(long version);
 }
