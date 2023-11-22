@@ -9,5 +9,6 @@ public class LedgerTagMapping : ClassMapping<LedgerTag>
     {
         this.AddEntity<LedgerTagMapping, LedgerTag>();
         Property(e => e.Description, pm => pm.NotNullable(true));
+        Property(e => e.Number, pm => pm.NotNullable(false));
     }
 }

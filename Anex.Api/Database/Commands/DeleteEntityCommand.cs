@@ -19,7 +19,7 @@ public class DeleteEntityCommand<TEntity> : IExecutableCommand
         var entity = await session.GetAsync<TEntity>(_id);
         if (entity == null)
         {
-            return new CommandResult(new[] { $"{typeof(TEntity).Name} not found with id: {_id}" });
+            return CommandResult.NotFoundResult<TEntity>(_id);
         }
 
         await session.DeleteAsync(entity);

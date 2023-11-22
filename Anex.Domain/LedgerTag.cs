@@ -13,8 +13,10 @@ public class LedgerTag : BaseEntity<LedgerTag>
     }
 
     public virtual string? Description { get; set; } = string.Empty;
+    public virtual int? Number { get; set; }
     protected override IEnumerable<IRule<LedgerTag>> GetValidationRules()
     {
         yield return CannotBeEmpty(lt => lt.Description);
+        yield return new RelayRule<LedgerTag>(lt => lt.Number.HasValue && lt.Number.Value <= 0, $"{nameof(Number)} cannot be negative for a {GetType().Name}");
     }
 }
