@@ -21,6 +21,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<ISessionHelper, SessionHelper>();
+builder.Services.AddDateOnlyTimeOnlyStringConverters();
 
 var app = builder.Build();
 

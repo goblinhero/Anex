@@ -12,6 +12,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Anex.Api.Database.Commands;
+using Anex.Api.Database.CustomTypes;
 using Anex.Api.Database.Queries;
 using Anex.DBMigration;
 using FluentMigrator.Runner;
@@ -43,6 +44,8 @@ public class SessionHelper : ISessionHelper
             if (member.GetRootMember().MemberType == MemberTypes.Property &&
                 ((PropertyInfo)member.GetRootMember()).PropertyType == typeof(DateTime))
                 customizer.Type<UtcDateTimeType>();
+            if(member.GetRootMember().MemberType == MemberTypes.Property && ((PropertyInfo)member.GetRootMember()).PropertyType == typeof(DateOnly))
+                customizer.Type<DateOnlyType>();
         };
         var configuration = new Configuration()
             .DataBaseIntegration(dbcp =>
