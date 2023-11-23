@@ -96,6 +96,6 @@ public class LedgerTagController : ControllerBase
             return BadRequest(commandResult);
         }
 
-        return Ok($"LedgerTag with id: {id} deleted.");
+        return Ok($"{nameof(LedgerTag)} with id: {id} deleted.");
     }
 }

@@ -7,7 +7,7 @@ public class LedgerTagDtoMapping: ClassMapping<LedgerTagDto>
 {
     public LedgerTagDtoMapping()
     {
-        Table("LedgerTag");
+        Table("ledgertag");
         this.AddEntityDto<LedgerTagDtoMapping, LedgerTagDto>();
         Property(m => m.Description);
         Property(m => m.Number);
