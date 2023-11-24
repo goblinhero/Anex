@@ -5,7 +5,7 @@ using Anex.Domain.Abstract;
 using Anex.Domain.Helpers;
 using NHibernate;
 
-namespace Anex.Api.Database.Commands;
+namespace Anex.Api.Database.Commands.Utilities;
 
 public class EntitySetter<TEntity>
     where TEntity : IEntity
