@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Anex.Api.Database;
 using Anex.Api.Database.Commands;
+using Anex.Api.Database.Commands.Abstract;
 using Anex.Api.Database.Queries;
 using Anex.Domain.Abstract;
 using Microsoft.AspNetCore.Mvc;
@@ -42,16 +43,16 @@ public abstract class BaseController : ControllerBase
             : BadRequest(commandResult);
     }
 
-    protected async Task<IActionResult> TryExecuteUpdateCommand<T>(IExecutableCommand command, long id)
+    protected async Task<IActionResult> TryExecuteUpdateCommand<TDto>(IExecutableCommand command, long id)
     {
         var commandResult = await _sessionHelper.TryExecuteCommand(command);
         return commandResult.Success
-            ? await TryExecuteSingleQuery<T>(id)
+            ? await TryExecuteSingleQuery<TDto>(id)
             : BadRequest(commandResult);
     }
     
-    protected async Task<IActionResult> TryExecuteCreateCommand<T>(BaseCreateCommand<T> command) 
-        where T : IHasId, IIsValidatable
+    protected async Task<IActionResult> TryExecuteCreateCommand<TEntity, TDto>(BaseCreateCommand<TEntity> command) 
+        where TEntity : IHasId, IIsValidatable
     {
         var commandResult = await _sessionHelper.TryExecuteCommand(command);
         if (!commandResult.Success)
@@ -60,6 +61,6 @@ public abstract class BaseController : ControllerBase
         }
         
         return command.AssignedId.HasValue
-            ? await TryExecuteSingleQuery<T>(command.AssignedId.Value)
+            ? await TryExecuteSingleQuery<TDto>(command.AssignedId.Value)
             : BadRequest("Failed to assign id");    }
 }

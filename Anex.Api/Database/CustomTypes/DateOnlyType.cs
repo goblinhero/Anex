@@ -15,7 +15,7 @@ public class DateOnlyType : IUserType
     {
         if (ReferenceEquals(x, y))
             return true;
-        
+
         if (x == null || y == null)
             return false;
 
@@ -27,23 +27,25 @@ public class DateOnlyType : IUserType
         return x.GetHashCode();
     }
 
-    public object NullSafeGet(DbDataReader rs, string[] names, ISessionImplementor session, object owner)
+    public object? NullSafeGet(DbDataReader rs, string[] names, ISessionImplementor session, object owner)
     {
         if (names.Length == 0)
             throw new ArgumentException("Expecting at least one column");
 
-        var date = (DateTime)NHibernateUtil.Date.NullSafeGet(rs, names[0], session);
-        return DateOnly.FromDateTime(date);
+        var date = (DateTime?)NHibernateUtil.Date.NullSafeGet(rs, names[0], session);
+        return date.HasValue ? DateOnly.FromDateTime(date.Value) : null;
     }
 
     public void NullSafeSet(DbCommand cmd, object? value, int index, ISessionImplementor session)
     {
         var parameter = cmd.Parameters[index];
 
-        if (value == null) {
+        if (value == null)
+        {
             parameter.Value = null;
         }
-        else {
+        else
+        {
             parameter.Value = ((DateOnly)value).ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
         }
     }

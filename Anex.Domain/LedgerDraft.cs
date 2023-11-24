@@ -40,9 +40,9 @@ public class LedgerDraft : BaseEntity<LedgerDraft>
             var ledgerPosts = postDraftGroup
                 .SelectMany(pd =>
                 {
-                    var post = new LedgerPost(pd.VoucherNumber, pd.FiscalDate, pd.Amount, pd.LedgerTag!);
+                    var post = new LedgerPost(pd.VoucherNumber!.Value, pd.FiscalDate, pd.Amount, pd.LedgerTag!);
                     if (pd.ContraTag == null) return new[] { post };
-                    var contraPost = new LedgerPost(pd.VoucherNumber, pd.FiscalDate, -pd.Amount, pd.ContraTag);
+                    var contraPost = new LedgerPost(pd.VoucherNumber.Value, pd.FiscalDate, -pd.Amount, pd.ContraTag);
                     return new[] { post, contraPost };
                 }).ToList();
             tempTransactions.Add(new EconomicTransaction(ledgerPosts));

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Anex.Api.Database.Commands;
+namespace Anex.Api.Database.Commands.Utilities;
 
 public struct CommandResult
 {

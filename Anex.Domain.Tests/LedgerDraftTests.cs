@@ -7,12 +7,11 @@ public class LedgerDraftTests
     [Fact]
     public void Should_Only_Process_Posts_With_Amount()
     {
-        var fiscalPeriod = new FiscalPeriod();
-        var postDraft = new LedgerPostDraft();
-        postDraft.Amount = decimal.Zero;
-
         var ledgerDraft = LedgerDraft.Create("Description");
-        ledgerDraft.FiscalPeriod = fiscalPeriod;
+        ledgerDraft.FiscalPeriod = new FiscalPeriod();
+        
+        var postDraft = LedgerPostDraft.Create(ledgerDraft);
+        postDraft.Amount = decimal.Zero;
 
         Assert.True(ledgerDraft.TryBookkeep(new[] { postDraft }, out var transactions, out _));
         Assert.True(transactions.Count == 0);
@@ -23,6 +22,6 @@ public class LedgerDraftTests
     {
         var ledgerDraft = LedgerDraft.Create("Description");
 
-        Assert.False(ledgerDraft.TryBookkeep(new LedgerPostDraft[0], out var transactions, out _));
+        Assert.False(ledgerDraft.TryBookkeep(Array.Empty<LedgerPostDraft>(), out var transactions, out _));
     }
 }

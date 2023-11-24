@@ -12,6 +12,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Anex.Api.Database.Commands;
+using Anex.Api.Database.Commands.Abstract;
+using Anex.Api.Database.Commands.Utilities;
 using Anex.Api.Database.CustomTypes;
 using Anex.Api.Database.Queries;
 using Anex.DBMigration;
@@ -24,6 +26,7 @@ public class SessionHelper : ISessionHelper
 {
     private static ISessionFactory? _sessionFactory;
     private static string? _connectionString;
+
     public static void Initialize(string connectionString, params Type[] mappingTypes)
     {
         _connectionString = connectionString;
@@ -41,10 +44,13 @@ public class SessionHelper : ISessionHelper
             map.Column(propertyPath.LocalMember.Name + "Id");
         modelMapper.BeforeMapProperty += (_, member, customizer) =>
         {
-            if (member.GetRootMember().MemberType == MemberTypes.Property &&
-                ((PropertyInfo)member.GetRootMember()).PropertyType == typeof(DateTime))
+            if (member.GetRootMember().MemberType == MemberTypes.Property && ((PropertyInfo)member.GetRootMember()).PropertyType == typeof(DateTime))
                 customizer.Type<UtcDateTimeType>();
-            if(member.GetRootMember().MemberType == MemberTypes.Property && ((PropertyInfo)member.GetRootMember()).PropertyType == typeof(DateOnly))
+            if (member.GetRootMember().MemberType == MemberTypes.Property && ((PropertyInfo)member.GetRootMember()).PropertyType == typeof(DateTime?))
+                customizer.Type<UtcDateTimeType>();
+            if (member.GetRootMember().MemberType == MemberTypes.Property && ((PropertyInfo)member.GetRootMember()).PropertyType == typeof(DateOnly))
+                customizer.Type<DateOnlyType>();
+            if (member.GetRootMember().MemberType == MemberTypes.Property && ((PropertyInfo)member.GetRootMember()).PropertyType == typeof(DateOnly?))
                 customizer.Type<DateOnlyType>();
         };
         var configuration = new Configuration()
@@ -75,7 +81,7 @@ public class SessionHelper : ISessionHelper
     public async Task<QueryResult<T>> TryExecuteQuery<T>(IExecutableQuery<T> query)
     {
         if (_sessionFactory == null) throw new Exception("Critical error, SessionFactory not initialized.");
-        
+
         using (var session = _sessionFactory.OpenSession())
         using (var tx = session.BeginTransaction())
         {
@@ -88,7 +94,7 @@ public class SessionHelper : ISessionHelper
     public async Task<CommandResult> TryExecuteCommand(IExecutableCommand command)
     {
         if (_sessionFactory == null) throw new Exception("Critical error, SessionFactory not initialized.");
-        
+
         using (var session = _sessionFactory.OpenSession())
         using (var tx = session.BeginTransaction())
         {
@@ -100,7 +106,8 @@ public class SessionHelper : ISessionHelper
             else
             {
                 await tx.RollbackAsync();
-            }            
+            }
+
             return result;
         }
     }
@@ -124,6 +131,7 @@ public class SessionHelper : ISessionHelper
             action(runner);
         }
     }
+
     private static ServiceProvider CreateMigrationServices()
     {
         return new ServiceCollection()
