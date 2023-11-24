@@ -1,5 +1,6 @@
 using System;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Anex.Api.Utilities;
 using Anex.Domain.Abstract;
 using Anex.Domain.Helpers;
@@ -20,16 +21,16 @@ public class EntitySetter<TEntity>
         _propertyHelper = propertyHelper;
     }
 
-    public void UpdateSimpleProperty<T>(Expression<Func<TEntity, T>> property, Action<T, T?>? postUpdate = null)
+    public void UpdateSimpleProperty<T>(Expression<Func<TEntity, T?>> property)
     {
         var propName = property.GetName();
         if (!_propertyHelper.TryGetValue(propName, out T? newValue))
             return;
         
-        UpdateEntity(property, newValue, postUpdate);
+        UpdateEntity(property, newValue);
     }
 
-    private void UpdateEntity<T>(Expression<Func<TEntity, T>> property, T? newValue, Action<T, T?>? postUpdate)
+    private void UpdateEntity<T>(Expression<Func<TEntity, T?>> property, T? newValue)
     {
         var propName = property.GetName();
         var oldValue = property.Compile().Invoke(_entity);
@@ -41,16 +42,15 @@ public class EntitySetter<TEntity>
         if(!propertyInfo.CanWrite) throw new Exception($"Property {propName} found on type {typeof(TEntity).Name} but it is read-only");
         
         propertyInfo.SetValue(_entity, newValue, null);
-        postUpdate?.Invoke(oldValue, newValue);
     }
 
-    public void UpdateComplexProperty<T>(Expression<Func<TEntity, T>> property, ISession session, Action<T, T?>? postUpdate = null)
+    public async Task UpdateComplexProperty<T>(Expression<Func<TEntity, T?>> property, ISession session)
         where T : class, IHasId
     {
         var propName = $"{property.GetName()}Id";
         if (!_propertyHelper.TryGetValue(propName, out long? newId))
             return;
-        var newValue = newId.HasValue ? session.Get<T>(newId.Value) : null;
-        UpdateEntity(property, newValue, postUpdate);
+        var newValue = newId.HasValue ? await session.GetAsync<T>(newId.Value) : null;
+        UpdateEntity(property, newValue);
     }
 }

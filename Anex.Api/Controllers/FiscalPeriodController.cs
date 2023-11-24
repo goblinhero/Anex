@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Anex.Api.Database;
 using Anex.Api.Database.Commands;
+using Anex.Api.Database.Commands.Utilities;
 using Anex.Api.Database.Queries;
 using Anex.Api.Dto;
 using Anex.Domain;
@@ -42,7 +43,7 @@ public class FiscalPeriodController : BaseController
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create(EditableFiscalPeriodDto dto)
     {
-        return await TryExecuteCreateCommand(new CreateFiscalPeriodCommand(dto));
+        return await TryExecuteCreateCommand<FiscalPeriod, FiscalPeriodDto>(new CreateFiscalPeriodCommand(dto));
     }
     
     [HttpDelete]
