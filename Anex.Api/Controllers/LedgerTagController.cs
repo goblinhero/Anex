@@ -14,13 +14,11 @@ namespace Anex.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class LedgerTagController : ControllerBase
+public class LedgerTagController : BaseController
 {
-    private readonly ISessionHelper _sessionHelper;
-
     public LedgerTagController(ISessionHelper sessionHelper)
+        : base(sessionHelper)
     {
-        _sessionHelper = sessionHelper;
     }
 
     [HttpGet]
@@ -28,10 +26,7 @@ public class LedgerTagController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Get()
     {
-        var query = await _sessionHelper.TryExecuteQuery(new GetListQuery<LedgerTagDto>());
-        return query.Success
-            ? Ok(query.Result)
-            : BadRequest($"An error occured. Details: {string.Join(Environment.NewLine,query.Errors)}");
+        return await TryExecuteQuery(new GetListQuery<LedgerTagDto>());
     }
 
     [HttpGet("{id}")]
@@ -39,10 +34,7 @@ public class LedgerTagController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(long id)
     {
-        var query = await _sessionHelper.TryExecuteQuery(new GetQuery<LedgerTagDto>(id));
-        return query.Success
-            ? Ok(query.Result)
-            : NotFound();
+        return await TryExecuteSingleQuery<LedgerTagDto>(id);
     }
 
     [HttpPost]
@@ -51,16 +43,7 @@ public class LedgerTagController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create(EditableLedgerTagDto dto)
     {
-        var command = new CreateLedgerTagCommand(dto);
-        var commandResult = await _sessionHelper.TryExecuteCommand(command);
-        if (!commandResult.Success)
-        {
-            return BadRequest(commandResult);
-        }
-
-        return command.AssignedId.HasValue
-            ? await GetById(command.AssignedId.Value)
-            : BadRequest("Failed to assign id");
+        return await TryExecuteCreateCommand(new CreateLedgerTagCommand(dto));
     }
 
     [HttpPut("{id}/{version}")]
@@ -68,34 +51,22 @@ public class LedgerTagController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(long id, int version, EditableLedgerTagDto dto)
     {
-        var commandResult = await _sessionHelper.TryExecuteCommand(new UpdateLedgerTagCommand(id, version, dto));
-        return commandResult.Success 
-            ? await GetById(id) 
-            : BadRequest(commandResult);
+        return await TryExecuteUpdateCommand<LedgerTag>(new UpdateLedgerTagCommand(id, version, dto), id);
     }
-    
+
     [HttpPatch("{id}/{version}")]
     [ProducesResponseType<LedgerTagDto>(200)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Patch(long id, int version, Dictionary<string, JsonElement> updates)
     {
-        var commandResult = await _sessionHelper.TryExecuteCommand(new PatchLedgerTagCommand(id, version, updates));
-        return commandResult.Success 
-            ? await GetById(id) 
-            : BadRequest(commandResult);
+        return await TryExecuteUpdateCommand<LedgerTag>(new PatchLedgerTagCommand(id, version, updates), id);
     }
-    
+
     [HttpDelete]
     [ProducesResponseType<string>(200)]
     [ProducesResponseType<CommandResult>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DeleteById(long id)
     {
-        var commandResult = await _sessionHelper.TryExecuteCommand(new DeleteEntityCommand<LedgerTag>(id));
-        if (!commandResult.Success)
-        {
-            return BadRequest(commandResult);
-        }
-
-        return Ok($"{nameof(LedgerTag)} with id: {id} deleted.");
+        return await TryExecuteDelete<LedgerTag>(id);
     }
 }

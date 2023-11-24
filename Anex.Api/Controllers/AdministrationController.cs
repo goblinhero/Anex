@@ -6,13 +6,11 @@ namespace Anex.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class AdministrationController : ControllerBase
+public class AdministrationController : BaseController
 {
-    private readonly ISessionHelper _sessionHelper;
-
     public AdministrationController(ISessionHelper sessionHelper)
+        : base(sessionHelper)
     {
-        _sessionHelper = sessionHelper;
     }
 
     [HttpPost("DBMigrateDown/{version}")]
