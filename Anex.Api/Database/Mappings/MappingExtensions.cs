@@ -22,6 +22,21 @@ public static class MappingExtensions
         mapping.Property(m => m.Created, pm => pm.NotNullable(true));
     }
 
+    public static void AddTransaction<TMapping, TType>(this TMapping mapping)
+        where TMapping : ClassMapping<TType>
+        where TType : class, ITransaction
+    {
+        mapping.Id(m => m.Id, m => m.Generator(Generators.HighLow, g => g.Params(new
+        {
+            max_lo = 50,
+            table = "nhibernate_ids",
+            column = "next_hi",
+            where = $"entity = '{typeof(TType).Name.ToLower()}'"
+        })));
+        mapping.Version(m => m.Version, m => m.Column("version"));
+        mapping.Property(m => m.Created, pm => pm.NotNullable(true));
+    }
+
     public static void AddEntityDto<TMapping, TType>(this TMapping mapping)
         where TMapping : ClassMapping<TType>
         where TType : class, IEntityDto

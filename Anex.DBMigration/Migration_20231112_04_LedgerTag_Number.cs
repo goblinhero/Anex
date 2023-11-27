@@ -6,16 +6,15 @@ namespace Anex.DBMigration;
 public class Migration_20231112_04_LedgerTag_Number : Migration
 {
     private string _newColumn = "number";
-    private const string _ledgerTagTable = "ledgertag";
 
     public override void Up()
     {
-        Alter.Table(_ledgerTagTable)
+        Alter.Table(TableConstants.LedgerTagTable)
             .AddColumn(_newColumn).AsInt32().Nullable();
     }
 
     public override void Down()
     {
-        Delete.Column(_newColumn).FromTable(_ledgerTagTable);
+        Delete.Column(_newColumn).FromTable(TableConstants.LedgerTagTable);
     }
 }

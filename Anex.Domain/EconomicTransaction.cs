@@ -11,7 +11,7 @@ public class EconomicTransaction : BaseTransaction<EconomicTransaction>
     {
         _ledgerPosts = ledgerPosts.ToList();
     }
-    public virtual IEnumerable<LedgerPost> LedgerPosts
+    public virtual IList<LedgerPost> LedgerPosts
     {
         get { return _ledgerPosts!; }
     }
