@@ -6,16 +6,14 @@ namespace Anex.DBMigration;
 [Migration(2023111203, "Adding LedgerTag table")]
 public class Migration_20231112_03_LedgerTag : Migration
 {
-    private const string _ledgerTagTable = "ledgertag";
-
     public override void Up()
     {
-        this.CreateEntityTable(_ledgerTagTable)
+        this.CreateEntityTable(TableConstants.LedgerTagTable)
             .WithColumn("description").AsString(255).NotNullable();
     }
 
     public override void Down()
     {
-        this.DeleteEntityTable(_ledgerTagTable);
+        this.DeleteEntityTable(TableConstants.LedgerTagTable);
     }
 }
