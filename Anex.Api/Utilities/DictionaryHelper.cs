@@ -25,6 +25,8 @@ public class DictionaryHelper : IPropertyHelper
         {
             new RelayStrategy<JsonElement?, object?>(_ => default(T), v => !v.HasValue || v.Value.ValueKind == JsonValueKind.Null),
             new RelayStrategy<JsonElement?, object?>(v => v!.Value.GetString(), _ => typeof(T) == typeof(string)),
+            new RelayStrategy<JsonElement?, object?>(v => DateOnly.Parse(v!.Value.GetString()!), _ => typeof(T) == typeof(DateOnly)),
+            new RelayStrategy<JsonElement?, object?>(v => DateOnly.Parse(v!.Value.GetString()!), _ => typeof(T) == typeof(DateOnly?)),
             new RelayStrategy<JsonElement?, object?>(v => v!.Value.GetDecimal(), _ => typeof(T) == typeof(decimal)),
             new RelayStrategy<JsonElement?, object?>(v => v!.Value.GetDecimal(), _ => typeof(T) == typeof(decimal?)),
             new RelayStrategy<JsonElement?, object?>(v => v!.Value.GetInt32(), _ => typeof(T) == typeof(int)),
